@@ -5,7 +5,8 @@
 # TODO: get the configs
 # TODO: store it on git( clone if not exists, commit, push)
 
-import git
+#import git
+import subprocess
 import sys
 import paramiko
 import ConfigParser
@@ -54,14 +55,36 @@ def get_copy(host):
 
     client.close()   
 
+def gitAdd(fileName, repoDir):
+    cmd = ['git', 'add', fileName]
+    p = subprocess.Popen(cmd, cwd=repoDir)
+    p.wait()
+
+def gitPull(repoDir):
+    cmd = ['git', 'pull']
+    p = subprocess.Popen(cmd, cwd=repoDir)
+    p.wait()
+
+def gitCommit(message, repoDir):
+    cmd = ['git', 'commit', '-a', '-m', message]
+    p = subprocess.Popen(cmd, cwd=repoDir)
+    p.wait()
+
+def gitPush(repoDir):
+    cmd = ['git', 'push']
+    p = subprocess.Popen(cmd, cwd=repoDir)
+    p.wait()
+    
 # in smc.conf must be stored the username+password
 def store2git(host):
     repopath=ENV['git']['repopath']
     # try open the repo, if none, then clone
     try:
-        repo=git.Repo(repopath)
+        # pull
+        gitPull(repopath)
         print "[+] get the repo %s"%repopath
-    except git.exc.NoSuchPathError:
+        print "[+] pulled"
+    except:
         print "error you must clone the repo first,"
         print "execute following commands:\n"
         t=repopath.split('/')
@@ -69,24 +92,14 @@ def store2git(host):
         print "git clone %s"%(ENV['git']['remote'])
         print
         sys.exit(-1) 
-    origin = repo.remotes.origin
-    # pull
-    origin.pull()
-    print "[+] pulled"
+    
     # commit the file if modified or new
-    untracked=repo.untracked_files
-    if len(untracked)>0 :
-        print "[+] untracked files:"
-        for u in untracked:
-            print "[+]  %s"%u
-        index = repo.index
-        index.add(untracked) 
-        print "[+] added"
-        index.commit("my commit message")
-        print "[+] commited"
-        # push
-        origin.push()
-        print "[+] pushed"
+    
+    gitCommit("time test commit", repopath)
+    print "[+] commited"
+    # push
+    gitPush(repopath)
+    print "[+] pushed"
 
 if __name__ == '__main__':
     loadENV()
