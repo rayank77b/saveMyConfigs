@@ -13,6 +13,20 @@ import ConfigParser
 #
 ENV={}
 
+#example of smc.conf
+#[git]
+#repo=https://rayank77b:xxxxx@github.com/rayank77b/testGitEclipse.git
+#repopath=/home/ray/tmp/testGitEclipse
+#
+#[host]
+#cmd=copy
+#ipaddress=xxxxxx
+#username=ray
+#password=xxxxx
+#remotepath=/etc/hosts
+#localpath=test/hosts
+
+
 # simple ini file
 def loadENV(configpath='smc.conf'):
     config = ConfigParser.RawConfigParser()
@@ -40,6 +54,7 @@ def get_copy(host):
 
     client.close()   
 
+# in smc.conf must be stored the username+password
 def store2git(host):
     repopath=ENV['git']['repopath']
     # try open the repo, if none, then clone
