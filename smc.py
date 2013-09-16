@@ -42,10 +42,10 @@ def get_copy(host):
 
 def store2git(host):
     repopath=ENV['git']['repopath']
-    
     # try open the repo, if none, then clone
     try:
         repo=git.Repo(repopath)
+        print "[+] get the repo %s"%repopath
     except git.exc.NoSuchPathError:
         print "error you must clone the repo first,"
         print "execute following commands:\n"
@@ -55,16 +55,31 @@ def store2git(host):
         print
         sys.exit(-1) 
     origin = repo.remotes.origin
-    origin.pull()
     # pull
+    origin.pull()
+    print "[+] pulled"
     # commit the file if modified or new
-    # push
+    untracked=repo.untracked_files
+    if len(untracked)>0 :
+        print "[+] untracked files:"
+        for u in untracked:
+            print "[+]  %s"%u
+        index = repo.index
+        index.add(untracked) 
+        print "[+] added"
+        index.commit("my commit message")
+        print "[+] commited"
+        # push
+        origin.push()
+        print "[+] pushed"
 
 if __name__ == '__main__':
     loadENV()
     host=ENV.keys()[0]
-    print host
+    print "[+] work on host: %s"%host
     if(ENV[host]['cmd'] == "copy"):
-        #get_copy(host)
+        print "[+] copy"
+        get_copy(host)
+        print "[+] push on git"
         store2git(host)
-
+    print "[+] all done"
