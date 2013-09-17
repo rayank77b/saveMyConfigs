@@ -20,7 +20,7 @@ ENV={}
 #repopath=/home/ray/tmp/testGitEclipse
 #
 #[host]
-#cmd=copy
+#cmd=file  # others: dir, enable-running
 #ipaddress=xxxxxx
 #username=ray
 #password=xxxxx
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     for host in ENV.keys():
         if host != 'git':
             print "[+] work on host: %s"%host
-            if(ENV[host]['cmd'] == "copy"):
+            if(ENV[host]['cmd'] == "file"):
                 get_copy(host)
                 add2git(repo, "added config host %s"%host)
     
