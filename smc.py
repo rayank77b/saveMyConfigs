@@ -21,6 +21,7 @@ def test_path(repo, path):
     p=path.split('/')
     if len(p)>1 :
         if not os.path.isdir(repo+"/"+p[0]) :
+            print "[+] %s does not exists, create it ..."%p[0]
             os.mkdir(repo+"/"+p[0])
 
 def get_copy(host):
@@ -30,23 +31,21 @@ def get_copy(host):
     passwd     = ENV[host]['password']
     paths = ENV[host]['file']
     repo       = ENV[C_GIT]['repopath']
-     
-    
     
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostip , username=name, password=passwd)
-
     ftp = client.open_sftp()
     
     for x in paths:
         remotepath=x['remotepath']
         localpath =x['localpath']
         test_path(repo, localpath)
+        print "[+] copy %s  to %s"%(remotepath, repo+"/"+localpath)
         ftp.get(remotepath, repo+"/"+localpath)
 
     client.close()
-    print "[+] copieng ended"
+    print "[+] copy ok"
 
 def open_repo():
     """ open the repo if exists and pull it"""
@@ -65,9 +64,11 @@ def open_repo():
         print "error you must clone the repo first,"
         print "execute following commands:\n"
         t=repopath.split('/')
-        print "cd %s"%('/'.join(t[:-1]))
-        print "git clone %s"%(ENV[C_GIT]['remote'])
+        print "  cd %s"%('/'.join(t[:-1]))
+        print "  git clone %s"%(ENV[C_GIT]['remote'])
         print
+        print "and you must set the username:password in .git/config url"
+        print "we dont handle username:password yet\n"
         sys.exit(-1)
 
 def add2git(repo, msg):
