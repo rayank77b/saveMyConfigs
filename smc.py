@@ -9,22 +9,11 @@ import git
 import subprocess
 import sys, os
 import paramiko
-import ConfigParser
+import readConfig
 
 #
 ENV={}
-
-# simple ini file
-def loadENV(configpath='smc.conf'):
-    print "[+] load configs..."
-    config = ConfigParser.RawConfigParser()
-    config.read(configpath)
-    sections = config.sections()
-    for section in sections:
-        ENV[section]={}
-        for x in config.options(section):
-            ENV[section][x]=config.get(section, x)
-    print "[+] load configs done"
+C_GIT='git-configs'
 
 def test_path(repo, path):
     """test if the remote file/directory is existing, 
@@ -39,18 +28,22 @@ def get_copy(host):
     hostip     = ENV[host]['ipaddress']
     name       = ENV[host]['username']
     passwd     = ENV[host]['password']
-    remotepath = ENV[host]['remotepath']
-    localpath  = ENV[host]['localpath']
-    repo       = ENV['git']['repopath']
+    paths = ENV[host]['file']
+    repo       = ENV[C_GIT]['repopath']
      
-    test_path(repo, localpath)
+    
     
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostip , username=name, password=passwd)
 
     ftp = client.open_sftp()
-    ftp.get(remotepath, repo+"/"+localpath)
+    
+    for x in paths:
+        remotepath=x['remotepath']
+        localpath =x['localpath']
+        test_path(repo, localpath)
+        ftp.get(remotepath, repo+"/"+localpath)
 
     client.close()
     print "[+] copieng ended"
@@ -58,7 +51,7 @@ def get_copy(host):
 def open_repo():
     """ open the repo if exists and pull it"""
     print "[+] open repo..."
-    repopath=ENV['git']['repopath']
+    repopath=ENV[C_GIT]['repopath']
     # try open the repo, if none, then clone
     try:
         repo=git.Repo(repopath)
@@ -73,13 +66,13 @@ def open_repo():
         print "execute following commands:\n"
         t=repopath.split('/')
         print "cd %s"%('/'.join(t[:-1]))
-        print "git clone %s"%(ENV['git']['remote'])
+        print "git clone %s"%(ENV[C_GIT]['remote'])
         print
         sys.exit(-1)
 
 def add2git(repo, msg):
     print "[+] start to add..."
-    repopath=ENV['git']['repopath']
+    repopath=ENV[C_GIT]['repopath']
     # commit the file if modified or new
     gitCommit(msg, repopath)
     print "[+] commited (%s)"%msg
@@ -99,14 +92,14 @@ def gitCommit(message, repoDir):
     p.wait()
 
 if __name__ == '__main__':
-    loadENV()
+    ENV=readConfig.read()
     
     repo=open_repo()
     
     for host in ENV.keys():
-        if host != 'git':
+        if host != C_GIT:
             print "[+] work on host: %s"%host
-            if(ENV[host]['cmd'] == "file"):
+            if 'file' in ENV[host].keys():
                 get_copy(host)
                 add2git(repo, "added config host %s"%host)
     

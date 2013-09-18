@@ -1,5 +1,5 @@
 # define git
-[git]
+[git-configs]
 username=name
 password=pass1
 repopath=/home/ray/path/toRepo.git
