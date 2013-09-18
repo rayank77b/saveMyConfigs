@@ -1,0 +1,4 @@
+TODO
+
+- copy directories
+- copy cisco running-config (ssh, enable)

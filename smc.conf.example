@@ -1,0 +1,36 @@
+# define git
+[git]
+username=name
+password=pass1
+repopath=/home/ray/path/toRepo.git
+remote=http://bla:bla@domain.com:8080/git/TestConfig.git
+
+# define host access data
+[host-bluber]
+host=bluber
+ipaddress=192.168.10.12
+username=name
+password=pass2
+
+[host-bluber2]
+host=bluber2
+ipaddress=192.168.10.33
+username=name
+password=pass3
+
+# define commands
+[file-bluber-config.xml]
+host=bluber
+remotepath=/path/config.xml
+localpath=bluber1/config.xml
+
+[file-bluber2-hosts]
+host=bluber2
+remotepath=/etc/hosts
+localpath=bluber2/hosts
+
+[file-bluber2-dnsmasq]
+host=bluber2
+remotepath=/etc/dnsmasq.conf
+localpath=bluber2/dnsmasq.conf
+

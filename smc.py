@@ -14,19 +14,6 @@ import ConfigParser
 #
 ENV={}
 
-#example of smc.conf
-#[git]
-#repo=https://rayank77b:xxxxx@github.com/rayank77b/testGitEclipse.git
-#repopath=/home/ray/tmp/testGitEclipse
-#
-#[host]
-#cmd=file  # others: dir, enable-running
-#ipaddress=xxxxxx
-#username=ray
-#password=xxxxx
-#remotepath=/etc/hosts
-#localpath=test/hosts
-
 # simple ini file
 def loadENV(configpath='smc.conf'):
     print "[+] load configs..."
