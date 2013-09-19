@@ -1,7 +1,8 @@
 #!/usr/bin/python
 #
-# Author  = Andrej Frank, IT-Designers, STZ Softwaretechnik
+# Author  = Andrej Frank, IT-Designers GmbH, STZ Softwaretechnik
 # Version = 0.0.1 Alpha
+# GNU GENERAL PUBLIC LICENSE
 # 
 # what we do:
 # - read configuration(user,pass,what to save, where to save)

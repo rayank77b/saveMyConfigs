@@ -1,5 +1,7 @@
 #############################################################
-# define git
+# GNU GENERAL PUBLIC LICENSE
+#
+# define git access data
 [git-configs]
 username=name
 password=pass1
@@ -7,14 +9,14 @@ repopath=/home/ray/path/toRepo.git
 remote=http://bla:bla@domain.com:8080/git/TestConfig.git
 
 #############################################################
-# define ssh server
+# define ssh server access data
 [ssh-server]
 ip = 192.168.10.50
 username = bla
 password = 111111
 
 #############################################################
-# define host access data
+# define hosts access data
 [host-bluber]
 host=bluber
 ipaddress=192.168.10.12
@@ -30,6 +32,12 @@ password=pass3
 [host-switch01]
 host = swicht01.mycompany.com
 ipaddress = 192.168.10.1
+username = blub
+password = blubpass
+
+[host-accessp1]
+host=ap541.mycompany.com
+ipadress = 192.168.10.2
 username = blub
 password = blubpass
 
@@ -54,4 +62,9 @@ localpath=bluber2/dnsmasq.conf
 host=swicht01.mycompany.com
 remotepath=/tmp/swicht01-running-config
 localpath=swicht01/running-config
+
+[ap541-accessp1]
+host=ap541.mycompany.com
+remotepath=/tmp/config.xml
+localpath=ap541/config.xml
 

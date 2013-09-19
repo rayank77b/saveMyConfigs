@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Author  = Andrej Frank, IT-Designers, STZ Softwaretechnik
+# Author  = Andrej Frank, IT-Designers GmbH, STZ Softwaretechnik
 # Version = 0.0.1 Alpha
 #
 # connect to the pc6248 WebUI switch and get the running-config, 
@@ -27,8 +27,8 @@ import readConfig
 class PC6248:
     def __init__(self, host, hostenv, sshenv):
         self.host = host
-        self.referer = 'https://'+self.host+'/newlogin.html'
-        self.referer2 = 'https://'+self.host+'/File_Upload_to_Server.html'
+        self.login_url ='/newlogin.html'
+        self.get_url='/File_Upload_to_Server.html'
         self.origin = 'https://'+self.host
         self.switch_user = hostenv['username']
         self.switch_pass = hostenv['password']
@@ -44,7 +44,7 @@ class PC6248:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
             'Origin':self.origin, 
             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36', 
-            'Referer':self.referer, 
+            'Referer':'https://'+self.host+self.login_url, 
             'Accept-Encoding': 'gzip,deflate,sdch',
             'Cache-Control': 'max-age=0'
         }
@@ -54,7 +54,7 @@ class PC6248:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
             'Origin':self.origin, 
             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36', 
-            'Referer':self.referer2, 
+            'Referer':'https://'+self.host+self.get_url, 
             'Accept-Encoding': 'gzip,deflate,sdch',
             'Cache-Control': 'max-age=0',
             'Cookie':''
@@ -70,13 +70,12 @@ class PC6248:
           + '&submit_flag=8&submit_target=upload_progress_dell.html' \
           + '&err_flag=0&err_msg=&clazz_information=File_Upload_to_Server.html' \
           + '&v_3_1_1=Apply+Changes'
-        
-
+    
     def login(self):
-        """ log in and return the cookie sidssl
+        """ log in and set the cookie sidssl
             return:  status, message"""
         conn = httplib.HTTPSConnection(self.host)
-        conn.request("POST", "/newlogin.html", self.paramsLogin, self.headersLogin)
+        conn.request("POST", self.login_url, self.paramsLogin, self.headersLogin)
         response = conn.getresponse()
         time.sleep(1)  # wait 1 second
         if response.status == 200:
@@ -100,7 +99,7 @@ class PC6248:
     def get_config(self):
         self.headersCMD['Cookie']=self.sid
         conn = httplib.HTTPSConnection(self.host)
-        conn.request("POST", "/File_Upload_to_Server.html", self.paramsCMD, self.headersCMD)
+        conn.request("POST", self.get_url, self.paramsCMD, self.headersCMD)
         time.sleep(4)
         response = conn.getresponse()
         if response.status == 200:
@@ -116,7 +115,7 @@ class PC6248:
 if __name__ == '__main__':
     ENV=readConfig.read()
     
-    host='sw02.entennetz.info'
+    host='swicht01.mycompany.com'
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']
     else:
