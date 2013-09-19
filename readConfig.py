@@ -14,6 +14,10 @@ def read(configpath='smc.conf'):
             r[section]={}
             for x in config.options(section):
                 r[section][x]=config.get(section, x)
+        if 'ssh-server' == section :
+            r[section]={}
+            for x in config.options(section):
+                r[section][x]=config.get(section, x)
         if 'host-' in section:
             host = config.get(section, 'host')
             if not host in r.keys():  
@@ -30,6 +34,16 @@ def read(configpath='smc.conf'):
             if not 'file' in r[host].keys():
                 r[host]['file']=[]
             r[host]['file'].append(f)
+        if 'pc6428-' in section:
+            host = config.get(section, 'host')
+            if not host in r.keys():  
+                r[host]={}
+            f={}
+            for x in ('remotepath','localpath'):
+                f[x]=config.get(section, x)
+            if not 'pc6428' in r[host].keys():
+                r[host]['pc6428']=[]
+            r[host]['pc6428'].append(f)
     print "[+] load configs done"
     return r
 
@@ -43,5 +57,5 @@ if __name__ == '__main__':
     print
     for k in ENV:
         for x in ENV[k]:
-            print k.ljust(12), ": ", x.ljust(12), " : ", ENV[k][x]
+            print k.ljust(22), ": ", x.ljust(12), " : ", ENV[k][x]
 

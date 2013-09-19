@@ -10,6 +10,7 @@ import subprocess
 import sys, os
 import paramiko
 import readConfig
+import pc6248
 
 #
 ENV={}
@@ -29,7 +30,7 @@ def get_copy(host):
     hostip     = ENV[host]['ipaddress']
     name       = ENV[host]['username']
     passwd     = ENV[host]['password']
-    paths = ENV[host]['file']
+    paths      = ENV[host]['file']
     repo       = ENV[C_GIT]['repopath']
     
     client = paramiko.SSHClient()
@@ -42,6 +43,31 @@ def get_copy(host):
         localpath =x['localpath']
         test_path(repo, localpath)
         print "[+] copy %s  to %s"%(remotepath, repo+"/"+localpath)
+        ftp.get(remotepath, repo+"/"+localpath)
+
+    client.close()
+    print "[+] copy ok"
+
+def get_copy_remote(host):
+    print "[+] start to copy..."
+    hostip     = ENV['ssh-server']['ip']
+    name       = ENV['ssh-server']['username']
+    passwd     = ENV['ssh-server']['password']
+    paths      = ENV[host]['pc6428']
+    repo       = ENV[C_GIT]['repopath']
+    
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    print "[+] connect to %s  user %s"%(hostip, name)
+    client.connect(hostip , username=name, password=passwd)
+    ftp = client.open_sftp()
+    
+    print paths
+    for x in paths:
+        remotepath=x['remotepath']
+        localpath =x['localpath']
+        test_path(repo, localpath)
+        print "[+] copy %s@%s  to %s"%(hostip, remotepath, repo+"/"+localpath)
         ftp.get(remotepath, repo+"/"+localpath)
 
     client.close()
@@ -92,6 +118,25 @@ def gitCommit(message, repoDir):
     p = subprocess.Popen(cmd, cwd=repoDir)
     p.wait()
 
+def getPC6248(host):
+    print "[+] start to get from pc6248  %s..."%host
+    if 'ssh-server' in ENV.keys():
+        sshenv = ENV['ssh-server']
+    else:
+        print "ERROR, no ssh-server config found"
+        sys.exit(-1)
+    hostenv=ENV[host]
+    cl = pc6248.PC6248(host, hostenv, sshenv)
+    #print cl
+    r, msg = cl.login()
+    print "[+] ",r, msg
+    if r==200:
+        r=cl.get_config()
+        if r:
+            print "[+] OK, get the files"
+        else:
+            print "[-] Error on getting files from pc6428 %s"%host
+
 if __name__ == '__main__':
     ENV=readConfig.read()
     
@@ -103,7 +148,10 @@ if __name__ == '__main__':
             if 'file' in ENV[host].keys():
                 get_copy(host)
                 add2git(repo, "added config host %s"%host)
-    
+            if 'pc6428' in ENV[host].keys():
+                getPC6248(host)
+                get_copy_remote(host)
+                add2git(repo, "added config host %s"%host)
     push2git(repo)
     print "[+] all done"
 
