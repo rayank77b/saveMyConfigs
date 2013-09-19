@@ -1,20 +1,27 @@
 #!/usr/bin/python
 #
-# TODO: read configuration(user,pass,what to save)
-# TODO: log in ssh
-# TODO: get the configs
-# TODO: store it on git( clone if not exists, commit, push)
+# Author  = Andrej Frank, IT-Designers, STZ Softwaretechnik
+# Version = 0.0.1 Alpha
+# 
+# what we do:
+# - read configuration(user,pass,what to save, where to save)
+# - get the config from switchs
+# - log in ssh, get the configs
+# - store it on git( clone if not exists, commit, push)
+#
+# at moment is it alpha and the error handling is very bad (like my english ;)
 
 import git
 import subprocess
 import sys, os
 import paramiko
+
 import readConfig
 import pc6248
 
-#
 ENV={}
 C_GIT='git-configs'
+C_SSH='ssh-server'
 
 def test_path(repo, path):
     """test if the remote file/directory is existing, 
@@ -50,11 +57,13 @@ def get_copy(host):
 
 def get_copy_remote(host):
     print "[+] start to copy..."
-    hostip     = ENV['ssh-server']['ip']
-    name       = ENV['ssh-server']['username']
-    passwd     = ENV['ssh-server']['password']
+    hostip     = ENV[C_SSH]['ip']
+    name       = ENV[C_SSH]['username']
+    passwd     = ENV[C_SSH]['password']
     paths      = ENV[host]['pc6428']
     repo       = ENV[C_GIT]['repopath']
+    
+    # it is better if we have temporaer local files
     
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -62,7 +71,6 @@ def get_copy_remote(host):
     client.connect(hostip , username=name, password=passwd)
     ftp = client.open_sftp()
     
-    print paths
     for x in paths:
         remotepath=x['remotepath']
         localpath =x['localpath']
@@ -70,6 +78,7 @@ def get_copy_remote(host):
         print "[+] copy %s@%s  to %s"%(hostip, remotepath, repo+"/"+localpath)
         ftp.get(remotepath, repo+"/"+localpath)
 
+    # we must delete the files 
     client.close()
     print "[+] copy ok"
 

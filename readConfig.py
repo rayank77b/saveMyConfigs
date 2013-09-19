@@ -1,7 +1,12 @@
 #!/usr/bin/python
+#
+# Author  = Andrej Frank, IT-Designers, STZ Softwaretechnik
+# Version = 0.0.1 Alpha
+# 
+# read and parse our config, to a python dictionary
+# we use simple INI-File
 
 import ConfigParser
-
 
 # simple ini file
 def read(configpath='smc.conf'):

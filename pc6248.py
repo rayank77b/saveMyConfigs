@@ -1,5 +1,7 @@
 #!/usr/bin/python
 #
+# Author  = Andrej Frank, IT-Designers, STZ Softwaretechnik
+# Version = 0.0.1 Alpha
 #
 # connect to the pc6248 WebUI switch and get the running-config, 
 # with upload to server
@@ -137,15 +139,4 @@ if __name__ == '__main__':
             print "ok"
         else:
             print "error"
-
-
-
-
-
-
-
-
-
-
-
 
