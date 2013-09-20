@@ -17,6 +17,7 @@ import subprocess
 import sys, os
 import shutil
 import paramiko
+from optparse import OptionParser
 
 import readConfig
 import pc6248
@@ -60,7 +61,7 @@ def get_copy(host):
 
 def get_copy_remote(host):
     print "[+] start to copy..."
-    hostip     = ENV[C_SSH]['ip']
+    hostip     = ENV[C_SSH]['ipaddress']
     name       = ENV[C_SSH]['username']
     passwd     = ENV[C_SSH]['password']
     paths      = ENV[host]['pc6428']
@@ -177,10 +178,29 @@ def move_local(host, how, nr):
     
 
 if __name__ == '__main__':
+
+    parser = OptionParser()
+    parser.add_option("-c", "--config", dest="config",
+                  help="get the config file", metavar="FILE")
+    parser.add_option("-q", "--quiet",
+                  action="store_false", dest="verbose", default=True,
+                  help="don't print status messages to stdout")
+
+    (options, args) = parser.parse_args()
+    configfile=''
+    if options.config==None:
+        sys.stderr.write('ERROR:   please give a configuration file (see -h)\n')
+        sys.exit(-1)
+    else:
+        configfile=options.config
+        if not os.path.isfile(configfile):
+            sys.stderr.write('ERROR:   can\'t open the file\n')
+            sys.exit(-1)
+
     print "[+] read configuration..."
-    ENV=readConfig.read(configpath='smc.conf.example')
-    #readConfig.printOut(ENV)
-    
+    ENV=readConfig.read(configpath=configfile)
+    readConfig.printOut(ENV)
+    sys.exit(0)
     repo=open_repo()
     
     for host in ENV.keys():
