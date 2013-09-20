@@ -50,18 +50,30 @@ def read(configpath='smc.conf'):
             if not 'pc6428' in r[host].keys():
                 r[host]['pc6428']=[]
             r[host]['pc6428'].append(f)
+        if 'ap541-' in section:
+            host = config.get(section, 'host')
+            if not host in r.keys():  
+                r[host]={}
+            f={}
+            for x in ('remotepath','localpath'):
+                f[x]=config.get(section, x)
+            if not 'ap541' in r[host].keys():
+                r[host]['ap541']=[]
+            r[host]['ap541'].append(f)
     print "[+] load configs done"
     return r
 
-if __name__ == '__main__':
-    ENV={}
-    ENV=read()
-    print ENV
+def printOut(env):
+    print env
     print
-    for k in ENV:
+    for k in env:
         print k
     print
-    for k in ENV:
-        for x in ENV[k]:
-            print k.ljust(22), ": ", x.ljust(12), " : ", ENV[k][x]
+    for k in env:
+        for x in env[k]:
+            print k.ljust(22), ": ", x.ljust(12), " : ", env[k][x]
+
+if __name__ == '__main__':
+    ENV=read(configpath='smc.conf.example')
+    printOut(ENV)
 

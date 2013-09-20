@@ -11,7 +11,7 @@ remote=http://bla:bla@domain.com:8080/git/TestConfig.git
 #############################################################
 # define ssh server access data
 [ssh-server]
-ip = 192.168.10.50
+ipaddress = 192.168.10.50
 username = bla
 password = 111111
 
@@ -37,7 +37,7 @@ password = blubpass
 
 [host-accessp1]
 host=ap541.mycompany.com
-ipadress = 192.168.10.2
+ipaddress = 192.168.10.2
 username = blub
 password = blubpass
 

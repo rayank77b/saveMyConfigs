@@ -15,10 +15,12 @@
 import git
 import subprocess
 import sys, os
+import shutil
 import paramiko
 
 import readConfig
 import pc6248
+import ap541
 
 ENV={}
 C_GIT='git-configs'
@@ -129,7 +131,7 @@ def gitCommit(message, repoDir):
     p.wait()
 
 def getPC6248(host):
-    print "[+] start to get from pc6248  %s..."%host
+    print "[+] start to get from Switch pc6248  %s..."%host
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']
     else:
@@ -139,16 +141,45 @@ def getPC6248(host):
     cl = pc6248.PC6248(host, hostenv, sshenv)
     #print cl
     r, msg = cl.login()
-    print "[+] ",r, msg
+    print "[+] Login ok: ",r, msg
     if r==200:
         r=cl.get_config()
         if r:
             print "[+] OK, get the files"
         else:
             print "[-] Error on getting files from pc6428 %s"%host
+    else:
+        print "[-] Error on getting files from pc6428 %s"%host
+
+def getAP541(host):
+    print "[+] start to get from Access Point ap541  %s..."%host
+    hostenv=ENV[host]
+    cl = ap541.AP541(host, hostenv)
+    #print cl
+    r, msg = cl.login()
+    print "[+] Login ok: ",r, msg
+    if r==200:
+        r=cl.get_config()
+        if r:
+            print "[+] OK, get the files"
+        else:
+            print "[-] Error on getting files from ap541 %s"%host
+    else:
+        print "[-] Error on getting files from ap541 %s"%host
+
+def move_local(host, how, nr):
+    print "[+] move local file..."
+    repo     = ENV[C_GIT]['repopath']
+    fromfile = ENV[host][how][nr]['remotepath']
+    tofile   = repo+"/"+ENV[host][how][nr]['localpath']
+    print "[+] move local file from %s to %s ..."%(fromfile, tofile)
+    shutil.move(fromfile, tofile)
+    
 
 if __name__ == '__main__':
-    ENV=readConfig.read()
+    print "[+] read configuration..."
+    ENV=readConfig.read(configpath='smc.conf.example')
+    #readConfig.printOut(ENV)
     
     repo=open_repo()
     
@@ -161,7 +192,11 @@ if __name__ == '__main__':
             if 'pc6428' in ENV[host].keys():
                 getPC6248(host)
                 get_copy_remote(host)
-                add2git(repo, "added config host %s"%host)
+                add2git(repo, "added pc6248 config from host %s"%host)
+            if 'ap541' in ENV[host].keys():
+                getAP541(host)
+                move_local(host, 'ap541', 0)
+                add2git(repo, "added AP541 config.xml from host %s"%host)
     push2git(repo)
     print "[+] all done"
 

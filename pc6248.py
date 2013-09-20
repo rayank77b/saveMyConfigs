@@ -32,7 +32,7 @@ class PC6248:
         self.origin = 'https://'+self.host
         self.switch_user = hostenv['username']
         self.switch_pass = hostenv['password']
-        self.server_ip   = sshenv['ip']
+        self.server_ip   = sshenv['ipaddress']
         f = hostenv['pc6428'][0]['remotepath']  # TODO: array: here can be different files
         self.server_file = f.split('/')[-1]
         self.server_path = f.split(self.server_file)[0]
@@ -107,15 +107,16 @@ class PC6248:
         return False
 
     def __str__(self):
-        return 'host: '+self.host +"\n"+ \
+        return 'PC6428: host: '+self.host +"\n"+ \
           "username: "+self.switch_user + "\n"+ \
           "file: " + self.server_file + "\n"+ \
           "path: "+self.server_path
 
 if __name__ == '__main__':
-    ENV=readConfig.read()
-    
+    # this should be moved to test file
+    ENV=readConfig.read(configpath='smc.conf.example')
     host='swicht01.mycompany.com'
+    
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']
     else:

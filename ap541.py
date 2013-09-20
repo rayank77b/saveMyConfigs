@@ -20,26 +20,26 @@ class AP541:
         self.host = host
         self.login_url ='/admin.cgi?action=logon'
         self.get_url='/config-dump.cgi'
-        self.origin = 'https://'+self.host
         self.username = hostenv['username']
         self.password = hostenv['password']
-        self.remotepath = hostenv['ap541'][0]['remotepath'] # 
+        self.remotepath = hostenv['ap541'][0]['remotepath'] 
         self.session = ''
         self.headersLogin = {'Connection':'keep-alive', 
             'Content-type': 'application/x-www-form-urlencoded',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
-            'Origin':self.origin, 
-            'DNT': '1'
+            'Origin':'https://'+self.host,
+            'DNT': '1',
             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36', 
             'Referer':'https://'+self.host+self.login_url, 
             'Accept-Encoding': 'gzip,deflate,sdch',
             'Cache-Control': 'max-age=0'
         }
-        self.paramsLogin = urllib.urlencode({'i_username':self.username, 'i_password':self.switch_password, 'login':'Log In'})
+        self.paramsLogin = urllib.urlencode({'i_username':self.username, 'i_password':self.password, 'login':'Log In'})
         self.headersCMD = {'Connection':'keep-alive', 
             'Content-type': 'application/x-www-form-urlencoded',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
-            'Origin':self.origin, 
+            'Origin':'https://'+self.host,
+            'DNT': '1',
             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36', 
             'Referer':'https://'+self.host+'/admin.cgi?action=config_man', 
             'Accept-Encoding': 'gzip,deflate,sdch',
@@ -57,15 +57,18 @@ class AP541:
         time.sleep(1)  # wait 1 second
         if response.status == 200:
             #print "[+] status: ",response.status,"  reason: ", response.reason
-            data = response.getdata()
+            data = response.read()
+            #print data
             for line in data.split('\n'):
-                if 'varCookie' in line:
-                    cookie_line=line
-                    break
-            # the line is similar to
-            # '   var varCookie = "asojdso23490u0dfa0fad0";
-            self.session='sessionSSL='+cookie_line.split('"')[1]
-            return response.status, response.reason
+                ## the line is similar to
+                ## ' var cookieValue = "asdfASDFasdfASDFasdfASDFasdfASDF";'  32 byte
+                if 'cookieValue' in line:
+                    self.session = 'sessionSSL='+line.split('"')[1]
+                    #print data
+                    #print "session: "+self.session
+                    if self.session == '':
+                        return -1, "no sessionSSL, connection ok, to much connections?"
+                    return response.status, response.reason
         return response.status, response.reason
 
     def get_config(self):
@@ -76,19 +79,24 @@ class AP541:
         response = conn.getresponse()
         if response.status == 200:
             data = response.read()
-            with f = open(self.remotepath, 'w')
+            with  open(self.remotepath, 'w') as f:
                 f.write(data)
             return True
         return False
 
+    # TODO: implement logout, ap541 handle to few connection 
+    def logout(self):
+        pass
+        
     def __str__(self):
         return 'AP541 : host: '+self.host +"\n"+ \
           "username: "+self.username+ "\n"+ \
-          "remotepath: " + self.remotepath + "\n"+ 
+          "remotepath: " + self.remotepath + "\n"
 
 if __name__ == '__main__':
-    ENV=readConfig.read()
-    
+    # this should be moved to test file
+    ENV=readConfig.read(configpath='smc.conf.example')
+    #readConfig.printOut(ENV)
     host='ap541.mycompany.com'
     
     if host in ENV.keys():
@@ -96,10 +104,9 @@ if __name__ == '__main__':
     else:
         print "ERROR, no host config found"
         sys.exit(-1)
-    #print sshenv
-    #print hostenv
+    print hostenv
     cl = AP541(host, hostenv)
-    #print cl
+    print cl
     r, msg = cl.login()
     print r, msg
     if r==200:
@@ -108,4 +115,5 @@ if __name__ == '__main__':
             print "ok"
         else:
             print "error"
-
+    else:
+        print "error: ", r, msg
