@@ -198,9 +198,9 @@ if __name__ == '__main__':
             sys.exit(-1)
 
     print "[+] read configuration..."
-    ENV=readConfig.read(configpath=configfile)
-    readConfig.printOut(ENV)
-    sys.exit(0)
+    ENV = readConfig.read(configpath=configfile)
+    #readConfig.printOut(ENV)
+    
     repo=open_repo()
     
     for host in ENV.keys():

@@ -114,8 +114,8 @@ class PC6248:
 
 if __name__ == '__main__':
     # this should be moved to test file
-    ENV=readConfig.read(configpath='smc.conf.example')
-    host='swicht01.mycompany.com'
+    ENV  = readConfig.read(configpath='smc.conf.example')
+    host = 'swicht01.mycompany.com'
     
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']

@@ -95,9 +95,9 @@ class AP541:
 
 if __name__ == '__main__':
     # this should be moved to test file
-    ENV=readConfig.read(configpath='smc.conf.example')
+    ENV  = readConfig.read(configpath='smc.conf.example')
     #readConfig.printOut(ENV)
-    host='ap541.mycompany.com'
+    host = 'ap541.mycompany.com'
     
     if host in ENV.keys():
         hostenv=ENV[host]

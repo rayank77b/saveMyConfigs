@@ -7,7 +7,11 @@
 # read and parse our config, to a python dictionary
 # we use simple INI-File
 
+import sys
 import ConfigParser
+
+C_GIT='git-configs'
+C_SSH='ssh-server'
 
 # simple ini file
 def read(configpath='smc.conf'):
@@ -60,8 +64,35 @@ def read(configpath='smc.conf'):
             if not 'ap541' in r[host].keys():
                 r[host]['ap541']=[]
             r[host]['ap541'].append(f)
-    print "[+] load configs done"
+    print "[+] verificate config"
+    _verificate(r)
     return r
+
+def _error(msg):
+    sys.stderr.write('ERROR in verificate configuration\n')
+    sys.stderr.write('  '+msg+'\n')
+    sys.exit(-1)
+
+def _verificate(e):
+    if not C_GIT in e.keys():
+        _error("No Git configuration found")
+    if not C_SSH in e.keys():
+        _error("No SSH configuration found")
+    for host in e:
+        if C_GIT in host:
+            for x in ('username', 'repopath', 'password', 'remote'):
+                if not x in e[host].keys():
+                    _error("missing parameter in git config: %s"%x)
+        elif C_SSH in host:
+            for x in ('username','password','ipaddress'):
+                if not x in e[host].keys():
+                    _error("missing parameter in ssh config: %s"%x)
+        else:
+            for x in ('username','password','ipaddress'):
+                if not x in e[host].keys():
+                    _error("missing parameter in host %s config: %s"%(host,x))
+            if len(e[host])<4:
+                _error("there is no command in host or something wrong")
 
 def printOut(env):
     print env
