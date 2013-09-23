@@ -19,6 +19,7 @@ import shutil
 import paramiko
 from optparse import OptionParser
 
+import ssh
 import readConfig
 import pc6248
 import ap541
@@ -39,8 +40,8 @@ def log(ok=True, msg='', exit=False)
         sys.exit(-1)
 
 def test_path(repo, path):
-    """test if the remote file/directory is existing, 
-        if not, create"""
+    '''test if the remote file/directory is existing, 
+        if not, create'''
     p=path.split('/')
     if len(p)>1 :
         if not os.path.isdir(repo+"/"+p[0]) :
@@ -48,6 +49,7 @@ def test_path(repo, path):
             os.mkdir(repo+"/"+p[0])
 
 def get_copy(host):
+    '''copy a remote file to local file'''
     log(ok=True, msg="start to copy...")
     hostip     = ENV[host]['ipaddress']
     name       = ENV[host]['username']
@@ -55,22 +57,15 @@ def get_copy(host):
     paths      = ENV[host]['file']
     repo       = ENV[C_GIT]['repopath']
     
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostip , username=name, password=passwd)
-    ftp = client.open_sftp()
-    
-    for x in paths:
-        remotepath=x['remotepath']
-        localpath =x['localpath']
-        test_path(repo, localpath)
-        log(ok=True, msg="copy %s  to %s"%(remotepath, repo+"/"+localpath))
-        ftp.get(remotepath, repo+"/"+localpath)
-
+    log(ok=True, msg="connect to %s  user %s"%(hostip, name))
+    client = ssh.open(hostip, name, passwd)
+    ssh.scp(client, paths, repo)
     client.close()
     log(ok=True, msg="copy ok")
 
 def get_copy_remote(host):
+    '''copy a remote file to local file, which was copied from pc6248 to remote file. 
+       we must delete the remote file'''
     log(ok=True, msg="start to copy...")
     hostip     = ENV[C_SSH]['ipaddress']
     name       = ENV[C_SSH]['username']
@@ -78,27 +73,17 @@ def get_copy_remote(host):
     paths      = ENV[host]['pc6428']
     repo       = ENV[C_GIT]['repopath']
     
-    # it is better if we have temporaer local files
-    
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # TODO: it is better if we have temporaer local files
     log(ok=True, msg="connect to %s  user %s"%(hostip, name))
-    client.connect(hostip , username=name, password=passwd)
-    ftp = client.open_sftp()
-    
+    client = ssh.open(hostip, name, passwd)
+    ssh.scp(client, paths, repo)
     for x in paths:
-        remotepath=x['remotepath']
-        localpath =x['localpath']
-        test_path(repo, localpath)
-        log(ok=True, msg="copy %s@%s  to %s"%(hostip, remotepath, repo+"/"+localpath))
-        ftp.get(remotepath, repo+"/"+localpath)
-
-    # we must delete the files 
+        ssh.remove(client, x)
     client.close()
     log(ok=True, msg="copy ok")
 
 def open_repo():
-    """ open the repo if exists and pull it"""
+    ''' open the repo if exists and pull it'''
     log(ok=True, msg="open repo...")
     repopath=ENV[C_GIT]['repopath']
     # try open the repo, if none, then clone
@@ -122,6 +107,7 @@ def open_repo():
         sys.exit(-1)
 
 def add2git(repo, msg):
+    ''' add a file/dir to git'''
     log(ok=True, msg="start to add...")
     repopath=ENV[C_GIT]['repopath']
     # commit the file if modified or new
@@ -129,12 +115,15 @@ def add2git(repo, msg):
     log(ok=True, msg="commited (%s)"%msg)
 
 def push2git(repo):
+    '''push to remote git'''
     log(ok=True, msg="start to push...")
     origin = repo.remotes.origin
     origin.push()
     log(ok=True, msg="pushed")
 
 def gitCommit(message, repoDir):
+    ''' we use "git commit -a -m message", because the python git has not work correct.
+        or we have not use it correct.'''
     cmd = ['git', 'add', '.']
     p = subprocess.Popen(cmd, cwd=repoDir)
     p.wait()
@@ -143,6 +132,7 @@ def gitCommit(message, repoDir):
     p.wait()
 
 def getPC6248(host):
+    ''' get the configuration of the PowerConnect 6248 Switch.'''
     log(ok=True, msg="start to get from Switch pc6248  %s..."%host)
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']
@@ -162,6 +152,7 @@ def getPC6248(host):
         log(ok=False,  msg="Error on getting files from pc6428 %s"%host)
 
 def getAP541(host):
+    ''' get the configuration of the Access Point AP541.'''
     log(ok=True, msg="start to get from Access Point ap541  %s..."%host)
     hostenv=ENV[host]
     cl = ap541.AP541(host, hostenv)
@@ -177,6 +168,7 @@ def getAP541(host):
         log(ok=False,  msg="Error on getting files from ap541 %s"%host
 
 def move_local(host, how, nr):
+    ''' move a local file. '''
     log(ok=True, msg="move local file...")
     repo     = ENV[C_GIT]['repopath']
     fromfile = ENV[host][how][nr]['remotepath']
@@ -186,7 +178,6 @@ def move_local(host, how, nr):
     
 
 if __name__ == '__main__':
-
     parser = OptionParser()
     parser.add_option("-c", "--config", dest="config",
                   help="get the config file", metavar="FILE")
