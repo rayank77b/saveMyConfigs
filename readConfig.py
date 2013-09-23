@@ -64,6 +64,16 @@ def read(configpath='smc.conf'):
             if not 'ap541' in r[host].keys():
                 r[host]['ap541']=[]
             r[host]['ap541'].append(f)
+        if 'dirs-' in section:
+            host = config.get(section, 'host')
+            if not host in r.keys():  
+                r[host]={}
+            f={}
+            for x in ('remotepath','localpath'):
+                f[x]=config.get(section, x)
+            if not 'dirs' in r[host].keys():
+                r[host]['dirs']=[]
+            r[host]['dirs'].append(f)
     print "[+] verificate config"
     _verificate(r)
     return r

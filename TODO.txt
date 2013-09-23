@@ -1,12 +1,11 @@
 TODO
 
 - handle username, password if not setted in .git/config
-- copy directories
-- copy cisco running-config (ssh, enable)
 - pc6248 dell switch: half work is done, runnin config is ok, with web ui
 - why pc6248 doesnt work with ssh paramiko, broken channel?
 - better dokumentation
 - better error handling
+- test access rights for file or dirs
 
 
 [+] copy myIP@myRemotePath  to myLocalPath

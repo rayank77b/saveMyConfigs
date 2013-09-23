@@ -68,3 +68,7 @@ host=ap541.mycompany.com
 remotepath=/tmp/config.xml
 localpath=ap541/config.xml
 
+[dirs-bluber2-hosts]
+host=bluber2
+remotepath=/etc/blub
+localpath=bluber2/blub

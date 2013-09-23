@@ -7,7 +7,7 @@
 # what we do:
 # - read configuration(user,pass,what to save, where to save)
 # - get the config from switchs
-# - log in ssh, get the configs
+# - log in ssh, get the configs/files/dirs
 # - store it on git( clone if not exists, commit, push)
 #
 # at moment is it alpha and the error handling is very bad (like my english ;)
@@ -17,6 +17,7 @@ import subprocess
 import sys, os
 import shutil
 import paramiko
+import tarfile
 from optparse import OptionParser
 
 import ssh
@@ -30,7 +31,8 @@ C_SSH='ssh-server'
 
 debug=True
 
-def log(ok=True, msg='', exit=False)
+def log(ok=True, msg='', exit=False):
+    '''simple log if the debug is true. '''
     if debug:
         if ok:
             print "[+] %s"%msg
@@ -38,15 +40,6 @@ def log(ok=True, msg='', exit=False)
             print "[-] %s"%msg
     if exit:
         sys.exit(-1)
-
-def test_path(repo, path):
-    '''test if the remote file/directory is existing, 
-        if not, create'''
-    p=path.split('/')
-    if len(p)>1 :
-        if not os.path.isdir(repo+"/"+p[0]) :
-            log(ok=True, msg="%s does not exists, create it ..."%p[0])
-            os.mkdir(repo+"/"+p[0])
 
 def get_copy(host):
     '''copy a remote file to local file'''
@@ -78,9 +71,44 @@ def get_copy_remote(host):
     client = ssh.open(hostip, name, passwd)
     ssh.scp(client, paths, repo)
     for x in paths:
-        ssh.remove(client, x)
+        ssh.remove(client, x['remotepath'])
     client.close()
     log(ok=True, msg="copy ok")
+
+def get_directory(host):
+    ''' get the remote diretory with ssh, tar and untar. '''
+    log(ok=True, msg="start to copy a directory...")
+    hostip     = ENV[host]['ipaddress']
+    name       = ENV[host]['username']
+    passwd     = ENV[host]['password']
+    paths      = ENV[host]['dirs']
+    repo       = ENV[C_GIT]['repopath']
+    
+    log(ok=True, msg="connect to %s  user %s"%(hostip, name))
+    client = ssh.open(hostip, name, passwd)
+    ftp = client.open_sftp()
+    for x in paths:
+        remote = x['remotepath']
+        local  = x['localpath']
+        log(ok=True, msg="copy dirs %s@%s to local %s/%s"%(host,remote,repo,local))
+        tokens = remote.split('/')
+        if tokens[-1] == '':
+            name = tokens[-2]
+            directory = '/'.join(tokens[:-2])
+        else:
+            name = tokens[-1]
+            directory = '/'.join(tokens[:-1])
+        err, lines = ssh.tar_c(client, name, directory)
+        if not err:  # move to the repo
+            tarname='/tmp/%s.tgz'%name
+            log(ok=True, msg="untar %s"%tarname)
+            ssh.scp_file(ftp, tarname, tarname)
+            ssh.remove(client, tarname)
+            tar = tarfile.open(tarname)
+            tar.extractall(path=repo+'/'+local)
+            tar.close()
+            os.remove(tarname)
+    client.close()
 
 def open_repo():
     ''' open the repo if exists and pull it'''
@@ -141,7 +169,7 @@ def getPC6248(host):
     hostenv=ENV[host]
     cl = pc6248.PC6248(host, hostenv, sshenv)
     r, msg = cl.login()
-    log(ok=True, msg="Login ok: ",r, msg)
+    log(ok=True, msg="Login ok: %d, %s"%(r, msg))
     if r==200:
         r=cl.get_config()
         if r:
@@ -163,9 +191,9 @@ def getAP541(host):
         if r:
             log(ok=True, msg="OK, get the files")
         else:
-            log(ok=False,  msg="Error on getting files from ap541 %s"%host
+            log(ok=False,  msg="Error on getting files from ap541 %s"%host)
     else:
-        log(ok=False,  msg="Error on getting files from ap541 %s"%host
+        log(ok=False,  msg="Error on getting files from ap541 %s"%host)
 
 def move_local(host, how, nr):
     ''' move a local file. '''
@@ -175,7 +203,6 @@ def move_local(host, how, nr):
     tofile   = repo+"/"+ENV[host][how][nr]['localpath']
     log(ok=True, msg="move local file from %s to %s ..."%(fromfile, tofile))
     shutil.move(fromfile, tofile)
-    
 
 if __name__ == '__main__':
     parser = OptionParser()
@@ -195,7 +222,7 @@ if __name__ == '__main__':
         if not os.path.isfile(configfile):
             sys.stderr.write('ERROR:   can\'t open the file\n')
             sys.exit(-1)
-    if !options.verbose:
+    if not options.verbose:
         debug=True
     
     log(ok=True, msg="read configuration...")
@@ -218,6 +245,9 @@ if __name__ == '__main__':
                 getAP541(host)
                 move_local(host, 'ap541', 0)
                 add2git(repo, "added AP541 config.xml from host %s"%host)
+            if 'dirs' in ENV[host].keys():
+                get_directory(host)
+                add2git(repo, "added direcotory from host %s"%host)
     push2git(repo)
     log(ok=True, msg="all done")
 

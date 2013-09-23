@@ -1,4 +1,14 @@
 import paramiko
+import os
+
+def _test_path(repo, path):
+    '''test if the remote file/directory is existing, 
+        if not, create'''
+    p=path.split('/')
+    if len(p)>1 :
+        if not os.path.isdir(repo+"/"+p[0]) :
+            log(ok=True, msg="%s does not exists, create it ..."%p[0])
+            os.mkdir(repo+"/"+p[0])
 
 def open(hostip, name, passwd):
     ''' open the ssh connection'''
@@ -13,30 +23,33 @@ def cmd(client, cmd):
     errs = stderr.readlines()
     outs = stdout.readlines()
     if len(errs)>0 :
-        return False, errs
+        return True, errs
     else:
-        return True, outs
+        return False, outs
 
 def remove(client, fname):
     '''remove a file, only in /tmp'''
     tokens = fname.split('/')
     if tokens[1] == 'tmp' :
-        err, lines = _ssh_cmd(client, "/bin/rm -f %s"%fname)
+        err, lines = cmd(client, "/bin/rm -f %s"%fname)
         return err, lines
     else:
-        return False, ["the file is not in /tmp, we delete only in /tmp! file: %s"%fname]
+        return True, ["the file is not in /tmp, we delete only in /tmp! file: %s"%fname]
 
 def tar_c(client, name, directory):
     ''' enter the direcotory and tar a directory to /tmp/name.tgz'''
-    err, lines = _ssh_cmd(client, "cd %s && /bin/tar zcf /tmp/%s.tgz %s"%(directory, name, name))
+    err, lines = cmd(client, "cd %s && /bin/tar zcf /tmp/%s.tgz %s"%(directory, name, name))
     return err, lines
 
+def scp_file(ftp, remote, local):
+    ''' copy a file '''
+    ftp.get(remote, local)
+    
 def scp(client, paths, repo):
     '''copy files in paths'''
     ftp = client.open_sftp()
     for x in paths:
         remotepath=x['remotepath']
         localpath =x['localpath']
-        test_path(repo, localpath)
-        log(ok=True, msg="copy %s  to %s"%(remotepath, repo+"/"+localpath))
-        ftp.get(remotepath, repo+"/"+localpath)
+        _test_path(repo, localpath)
+        scp_file(ftp, remotepath, repo+"/"+localpath)
