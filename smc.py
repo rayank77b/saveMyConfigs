@@ -27,17 +27,28 @@ ENV={}
 C_GIT='git-configs'
 C_SSH='ssh-server'
 
+debug=True
+
+def log(ok=True, msg='', exit=False)
+    if debug:
+        if ok:
+            print "[+] %s"%msg
+        else:
+            print "[-] %s"%msg
+    if exit:
+        sys.exit(-1)
+
 def test_path(repo, path):
     """test if the remote file/directory is existing, 
         if not, create"""
     p=path.split('/')
     if len(p)>1 :
         if not os.path.isdir(repo+"/"+p[0]) :
-            print "[+] %s does not exists, create it ..."%p[0]
+            log(ok=True, msg="%s does not exists, create it ..."%p[0])
             os.mkdir(repo+"/"+p[0])
 
 def get_copy(host):
-    print "[+] start to copy..."
+    log(ok=True, msg="start to copy...")
     hostip     = ENV[host]['ipaddress']
     name       = ENV[host]['username']
     passwd     = ENV[host]['password']
@@ -53,14 +64,14 @@ def get_copy(host):
         remotepath=x['remotepath']
         localpath =x['localpath']
         test_path(repo, localpath)
-        print "[+] copy %s  to %s"%(remotepath, repo+"/"+localpath)
+        log(ok=True, msg="copy %s  to %s"%(remotepath, repo+"/"+localpath))
         ftp.get(remotepath, repo+"/"+localpath)
 
     client.close()
-    print "[+] copy ok"
+    log(ok=True, msg="copy ok")
 
 def get_copy_remote(host):
-    print "[+] start to copy..."
+    log(ok=True, msg="start to copy...")
     hostip     = ENV[C_SSH]['ipaddress']
     name       = ENV[C_SSH]['username']
     passwd     = ENV[C_SSH]['password']
@@ -71,7 +82,7 @@ def get_copy_remote(host):
     
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print "[+] connect to %s  user %s"%(hostip, name)
+    log(ok=True, msg="connect to %s  user %s"%(hostip, name))
     client.connect(hostip , username=name, password=passwd)
     ftp = client.open_sftp()
     
@@ -79,25 +90,25 @@ def get_copy_remote(host):
         remotepath=x['remotepath']
         localpath =x['localpath']
         test_path(repo, localpath)
-        print "[+] copy %s@%s  to %s"%(hostip, remotepath, repo+"/"+localpath)
+        log(ok=True, msg="copy %s@%s  to %s"%(hostip, remotepath, repo+"/"+localpath))
         ftp.get(remotepath, repo+"/"+localpath)
 
     # we must delete the files 
     client.close()
-    print "[+] copy ok"
+    log(ok=True, msg="copy ok")
 
 def open_repo():
     """ open the repo if exists and pull it"""
-    print "[+] open repo..."
+    log(ok=True, msg="open repo...")
     repopath=ENV[C_GIT]['repopath']
     # try open the repo, if none, then clone
     try:
         repo=git.Repo(repopath)
-        print "[+] get the repo %s"%repopath
+        log(ok=True, msg="get the repo %s"%repopath)
         origin = repo.remotes.origin
         # pull
         origin.pull()
-        print "[+] pulled"
+        log(ok=True, msg="pulled")
         return repo
     except git.exc.NoSuchPathError:
         print "error you must clone the repo first,"
@@ -111,17 +122,17 @@ def open_repo():
         sys.exit(-1)
 
 def add2git(repo, msg):
-    print "[+] start to add..."
+    log(ok=True, msg="start to add...")
     repopath=ENV[C_GIT]['repopath']
     # commit the file if modified or new
     gitCommit(msg, repopath)
-    print "[+] commited (%s)"%msg
+    log(ok=True, msg="commited (%s)"%msg)
 
 def push2git(repo):
-    print "[+] start to push..."
+    log(ok=True, msg="start to push...")
     origin = repo.remotes.origin
     origin.push()
-    print "[+] pushed"     
+    log(ok=True, msg="pushed")
 
 def gitCommit(message, repoDir):
     cmd = ['git', 'add', '.']
@@ -132,48 +143,45 @@ def gitCommit(message, repoDir):
     p.wait()
 
 def getPC6248(host):
-    print "[+] start to get from Switch pc6248  %s..."%host
+    log(ok=True, msg="start to get from Switch pc6248  %s..."%host)
     if 'ssh-server' in ENV.keys():
         sshenv = ENV['ssh-server']
     else:
-        print "ERROR, no ssh-server config found"
-        sys.exit(-1)
+        log(ok=False, msg="ERROR, no ssh-server config found", exit=True)
     hostenv=ENV[host]
     cl = pc6248.PC6248(host, hostenv, sshenv)
-    #print cl
     r, msg = cl.login()
-    print "[+] Login ok: ",r, msg
+    log(ok=True, msg="Login ok: ",r, msg)
     if r==200:
         r=cl.get_config()
         if r:
-            print "[+] OK, get the files"
+            log(ok=True, msg="OK, get the files")
         else:
-            print "[-] Error on getting files from pc6428 %s"%host
+            log(ok=False, msg="Error on getting files from pc6428 %s"%host)
     else:
-        print "[-] Error on getting files from pc6428 %s"%host
+        log(ok=False,  msg="Error on getting files from pc6428 %s"%host)
 
 def getAP541(host):
-    print "[+] start to get from Access Point ap541  %s..."%host
+    log(ok=True, msg="start to get from Access Point ap541  %s..."%host)
     hostenv=ENV[host]
     cl = ap541.AP541(host, hostenv)
-    #print cl
     r, msg = cl.login()
-    print "[+] Login ok: ",r, msg
+    log(ok=True, msg="Login ok: %d %s"%(r, msg))
     if r==200:
         r=cl.get_config()
         if r:
-            print "[+] OK, get the files"
+            log(ok=True, msg="OK, get the files")
         else:
-            print "[-] Error on getting files from ap541 %s"%host
+            log(ok=False,  msg="Error on getting files from ap541 %s"%host
     else:
-        print "[-] Error on getting files from ap541 %s"%host
+        log(ok=False,  msg="Error on getting files from ap541 %s"%host
 
 def move_local(host, how, nr):
-    print "[+] move local file..."
+    log(ok=True, msg="move local file...")
     repo     = ENV[C_GIT]['repopath']
     fromfile = ENV[host][how][nr]['remotepath']
     tofile   = repo+"/"+ENV[host][how][nr]['localpath']
-    print "[+] move local file from %s to %s ..."%(fromfile, tofile)
+    log(ok=True, msg="move local file from %s to %s ..."%(fromfile, tofile))
     shutil.move(fromfile, tofile)
     
 
@@ -196,8 +204,10 @@ if __name__ == '__main__':
         if not os.path.isfile(configfile):
             sys.stderr.write('ERROR:   can\'t open the file\n')
             sys.exit(-1)
-
-    print "[+] read configuration..."
+    if !options.verbose:
+        debug=True
+    
+    log(ok=True, msg="read configuration...")
     ENV = readConfig.read(configpath=configfile)
     #readConfig.printOut(ENV)
     
@@ -205,7 +215,7 @@ if __name__ == '__main__':
     
     for host in ENV.keys():
         if host != C_GIT:
-            print "[+] work on host: %s"%host
+            log(ok=True, msg="work on host: %s"%host)
             if 'file' in ENV[host].keys():
                 get_copy(host)
                 add2git(repo, "added config host %s"%host)
@@ -218,7 +228,7 @@ if __name__ == '__main__':
                 move_local(host, 'ap541', 0)
                 add2git(repo, "added AP541 config.xml from host %s"%host)
     push2git(repo)
-    print "[+] all done"
+    log(ok=True, msg="all done")
 
 
 
