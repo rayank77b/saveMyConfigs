@@ -51,6 +51,7 @@ def get_copy(host):
     repo       = ENV[C_GIT]['repopath']
     
     log(ok=True, msg="connect to %s  user %s"%(hostip, name))
+    print "%s %s %s"%(hostip, name, passwd)
     client = ssh.open(hostip, name, passwd)
     ssh.scp(client, paths, repo)
     client.close()
