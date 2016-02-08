@@ -19,6 +19,7 @@ import shutil
 import paramiko
 import tarfile
 from optparse import OptionParser
+import ssl
 
 import ssh
 import readConfig
@@ -91,7 +92,7 @@ def get_directory(host):
     for x in paths:
         remote = x['remotepath']
         local  = x['localpath']
-        log(ok=True, msg="copy dirs %s@%s to local %s/%s"%(host,remote,repo,local))
+        log(ok=True, msg="copy dirs %s:/%s to local %s/%s"%(host,remote,repo,local))
         tokens = remote.split('/')
         if tokens[-1] == '':
             name = tokens[-2]
@@ -99,6 +100,7 @@ def get_directory(host):
         else:
             name = tokens[-1]
             directory = '/'.join(tokens[:-1])
+    #    print "client: %s   name: %s   dir: %s"%(client, name, directory)
         err, lines = ssh.tar_c(client, name, directory)
         if not err:  # move to the repo
             tarname='/tmp/%s.tgz'%name
@@ -109,6 +111,9 @@ def get_directory(host):
             tar.extractall(path=repo+'/'+local)
             tar.close()
             os.remove(tarname)
+        else:
+            log(ok=False, msg="something is wrong on ssh tar: %s"%lines)
+            sys.exit(-1)
     client.close()
 
 def open_repo():
@@ -206,6 +211,7 @@ def move_local(host, how, nr):
     shutil.move(fromfile, tofile)
 
 if __name__ == '__main__':
+    ssl._create_default_https_context = ssl._create_unverified_context
     parser = OptionParser()
     parser.add_option("-c", "--config", dest="config",
                   help="get the config file", metavar="FILE")

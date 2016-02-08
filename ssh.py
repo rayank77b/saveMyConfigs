@@ -1,5 +1,18 @@
 import paramiko
 import os
+import sys
+
+debug=True
+
+def log(ok=True, msg='', exit=False):
+    '''simple log if the debug is true. '''
+    if debug:
+        if ok:
+            print "[+] %s"%msg
+        else:
+            print "[-] %s"%msg
+    if exit:
+        sys.exit(-1)
 
 def _test_path(repo, path):
     '''test if the remote file/directory is existing, 
@@ -38,7 +51,10 @@ def remove(client, fname):
 
 def tar_c(client, name, directory):
     ''' enter the direcotory and tar a directory to /tmp/name.tgz'''
+#    print "tar_c ( client: %s, name: %s, directory: %s)"%(client, name, directory)
     err, lines = cmd(client, "cd %s && /bin/tar zcf /tmp/%s.tgz %s"%(directory, name, name))
+#    print err
+#    print lines
     return err, lines
 
 def scp_file(ftp, remote, local):
