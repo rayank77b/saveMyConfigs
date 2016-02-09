@@ -1,8 +1,10 @@
 package saveMyConfigs.config;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import java.io.IOException;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -39,6 +41,8 @@ public class TestENV {
 		assertEquals("username is false", "name", host.getUserName());
 		assertEquals("we have 4 host in example ini", 4, env.getHostsCount());
 		
+		Map<String, Command> c = env.getCommandMap();
+		c.forEach((k,v)->System.out.println(k));
 		
 	}
 
