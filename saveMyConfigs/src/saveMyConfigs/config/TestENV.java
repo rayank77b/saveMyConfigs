@@ -42,7 +42,11 @@ public class TestENV {
 		assertEquals("we have 4 host in example ini", 4, env.getHostsCount());
 		
 		Map<String, Command> c = env.getCommandMap();
-		c.forEach((k,v)->System.out.println(k));
+		//c.forEach((k,v)->System.out.println(k));
+		assertEquals("should be 5 commands in example ini", 5, c.size());
+		Command fileCommand1 = env.getCommand("file-bluber-config.xml");
+		assertEquals("should be file", "file", fileCommand1.getCommand());
+		assertEquals("should be remotepath /path/config.xml", "/path/config.xml", fileCommand1.getRemotePath());
 		
 	}
 

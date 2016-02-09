@@ -54,4 +54,8 @@ public class ENV {
 		return this.commands;
 	}
 	
+	public Command getCommand(String command) {
+		return this.commands.get(command);
+	}
+	
 }

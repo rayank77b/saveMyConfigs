@@ -91,6 +91,9 @@ public class Command {
 		}
 	}
 	
+	public String getCommand() {
+		return command;
+	}
 
 	public String getHost() {
 		return host;
