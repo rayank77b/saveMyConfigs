@@ -22,7 +22,7 @@ public class TestReadINI {
 		} catch (IOException e) {
 			fail("errors on read file");
 		}
-		assertNotNull("rini was created", rini);
+		assertNotNull("rini was not created", rini);
 		
 		Map<String, List<String>> m = rini.getLists();
 		assertNotNull("hash map was null", m);
@@ -45,6 +45,9 @@ public class TestReadINI {
 		assertNotNull("keys are null", k);
 		assertTrue("has no host-bluber element",  k.contains("host-bluber"));
 		//System.out.println(k);
+		k = rini.getKeys("host2-.*");
+		assertEquals("is not zero size", 0, k.size());
+		
 		
 	}
 
