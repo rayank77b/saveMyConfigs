@@ -31,6 +31,10 @@ public class TestENV {
 		assertEquals("repopath is false", "/home/ray/path/toRepo.git", gsc.getRemotePath());
 		assertEquals("remote url is false", "http://bla:bla@domain.com:8080/git/TestConfig.git", gsc.getRemoteUrl());
 		
+		SSHServerConfig sshsc = env.getSSHServer();
+		assertEquals("username is false", "bla", sshsc.getUserName());
+		assertEquals("password is false", "111111", sshsc.getPassword());
+		
 		Host host = env.getHosts("bluber");
 		assertEquals("username is false", "name", host.getUserName());
 	}

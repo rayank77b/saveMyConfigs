@@ -9,6 +9,7 @@ import java.util.Set;
 public class ENV {
 	private String fileNameIni;
 	private GitServerConfig gitServer;
+	private SSHServerConfig sshServer;
 	private Map<String, Host> hosts;
 	private ReadINI iniObject;
 	/**
@@ -23,8 +24,10 @@ public class ENV {
 			throw new ConfigurationErrorException("errors read INI File");
 		}
 		setGitServerConfiguration();
+		setSSHServerConfiguration();
 		hosts = new HashMap<String, Host>();
 		setHostConfiguration();
+		
 	}
 	
 	private void setGitServerConfiguration() throws ConfigurationErrorException {
@@ -60,6 +63,38 @@ public class ENV {
 	 */
 	public GitServerConfig getGitServer() {
 		return gitServer;
+	}
+	
+	private void setSSHServerConfiguration() throws ConfigurationErrorException {
+		// FIXME: at moment we use only 1 git-server for save configurations
+		List<String> list = iniObject.getItem("ssh-server");
+		if(list.size()==0) {
+			throw new ConfigurationErrorException("errors on read git server configuration");
+		}
+		String username=null;
+		String password=null;
+		String ip=null;
+		for(String s : list) {
+			String[] s2 = s.split("=");
+			if(s2[0].trim().equals("username")) 
+				username=s2[1].trim();
+			if(s2[0].trim().equals("password")) 
+				password=s2[1].trim();
+			if(s2[0].trim().equals("ipaddress")) 
+				ip=s2[1].trim();
+		}
+		if(username==null || password==null || ip==null) {
+			throw new ConfigurationErrorException("errors on read ssh server configuration, element lose");
+		}
+		this.sshServer = new SSHServerConfig(ip, username, password);
+		
+	}
+
+	/**
+	 * @return the sshServer
+	 */
+	public SSHServerConfig getSSHServer() {
+		return sshServer;
 	}
 	
 	private void setHostConfiguration()  throws ConfigurationErrorException {
