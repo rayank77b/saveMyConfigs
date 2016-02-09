@@ -1,5 +1,7 @@
 package saveMyConfigs.config;
 
+import java.util.List;
+
 /*
 [git-configs]
 username=name
@@ -18,6 +20,35 @@ public class GitServerConfig {
 		this.password = password;
 		this.remotePath = remotePath;
 		this.remoteUrl = remoteUrl;
+	}
+	
+
+	public static GitServerConfig setGitServerConfiguration(ReadINI iniObject) throws ConfigurationErrorException {
+		// FIXME: at moment we use only 1 git-server for save configurations
+		List<String> list = iniObject.getItem("git-configs");
+		if(list.size()==0) {
+			throw new ConfigurationErrorException("errors on read git server configuration");
+		}
+		String username=null;
+		String password=null;
+		String repopath=null;
+		String remote=null;
+		for(String s : list) {
+			String[] s2 = s.split("=");
+			if(s2[0].trim().equals("username")) 
+				username=s2[1].trim();
+			if(s2[0].trim().equals("password")) 
+				password=s2[1].trim();
+			if(s2[0].trim().equals("repopath")) 
+				repopath=s2[1].trim();
+			if(s2[0].trim().equals("remote")) 
+				remote=s2[1].trim();
+		}
+		if(username==null || password==null || repopath==null || remote==null) {
+			throw new ConfigurationErrorException("errors on read git server configuration, element lose");
+		}
+		return new GitServerConfig(username, password, repopath, remote);
+		
 	}
 
 	/**

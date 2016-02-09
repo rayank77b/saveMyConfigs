@@ -37,6 +37,9 @@ public class TestENV {
 		
 		Host host = env.getHosts("bluber");
 		assertEquals("username is false", "name", host.getUserName());
+		assertEquals("we have 4 host in example ini", 4, env.getHostsCount());
+		
+		
 	}
 
 }

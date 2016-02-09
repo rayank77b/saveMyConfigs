@@ -1,5 +1,9 @@
 package saveMyConfigs.config;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /*
 [host-bluber]
 host=bluber
@@ -20,9 +24,41 @@ public class Host {
 		this.password = password;
 	}
 	
-	/**
-	 * @return the hostName
-	 */
+	public static void setHostConfiguration(ReadINI iniObject, Map<String, Host> hosts)  throws ConfigurationErrorException {
+		Set<String> hostsKeys = iniObject.getKeys("host-.*");
+		if(hostsKeys.size()==0) {
+			throw new ConfigurationErrorException("errors on read hosts configuration");
+		}
+		for(String hostconfig : hostsKeys) {
+			List<String> hostlist = iniObject.getItem(hostconfig);
+			String hostname=null;
+			String ip=null;
+			String username=null;
+			String password=null;
+			for(String s : hostlist) {
+				//System.out.println(s);
+				String[] s2 = s.split("=");
+				if(s2[0].trim().equals("username")) 
+					username=s2[1].trim();
+				if(s2[0].trim().equals("password")) 
+					password=s2[1].trim();
+				if(s2[0].trim().equals("host")) 
+					hostname=s2[1].trim();
+				if(s2[0].trim().equals("ipaddress")) 
+					ip=s2[1].trim();
+			}
+			//System.out.println(hostconfig + " " +hostlist);
+			if(username==null || password==null || hostname==null || ip==null) {
+				throw new ConfigurationErrorException("errors on read host configuration, element 2lose");
+			}
+			
+			hosts.put(hostname, new Host(hostname, ip, username, password));
+		}
+		if(hosts.size()==0) {
+			throw new ConfigurationErrorException("errors on read hosts configuration, no hosts");
+		}
+	}
+	
 	public String getHostName() {
 		return hostName;
 	}
