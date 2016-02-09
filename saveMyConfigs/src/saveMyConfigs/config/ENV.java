@@ -1,6 +1,7 @@
 package saveMyConfigs.config;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class ENV {
 			throw new ConfigurationErrorException("errors read INI File");
 		}
 		setGitServerConfiguration();
+		hosts = new HashMap<String, Host>();
 		setHostConfiguration();
 	}
 	
@@ -94,6 +96,19 @@ public class ENV {
 			throw new ConfigurationErrorException("errors on read hosts configuration, no hosts");
 		}
 	}
+	
+	public int getHostsCount() {
+		return this.hosts.size();
+	}
+
+	/**
+	 * @return the hosts
+	 */
+	public Host getHosts(String hostname) {
+		return this.hosts.get(hostname);
+	}
+	
+	
 	
 	
 }
