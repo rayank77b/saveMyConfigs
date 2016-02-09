@@ -5,9 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ReadINI {
 	private String name;
@@ -54,6 +57,12 @@ public class ReadINI {
 	
 	public List<String> getItem(String item) {
 		return lists.get(item);
+	}
+	
+	public Set<String> getKeys(String pattern) {
+		Set<String> tmp = lists.keySet();		
+		Stream<String> ss = tmp.stream().filter(p -> p.matches(pattern));
+		return ss.collect(Collectors.toSet());
 	}
 	
 	public Set<String> getKeys() {

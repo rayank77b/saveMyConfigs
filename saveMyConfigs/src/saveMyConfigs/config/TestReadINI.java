@@ -35,7 +35,16 @@ public class TestReadINI {
 		
 		Set<String> k = rini.getKeys();
 		assertNotNull("keys are null", k);
-		System.out.println(k);
+		assertTrue("has no ap541-accessp1 element",  k.contains("ap541-accessp1"));
+		
+		bluber = rini.getItem("dirs-bluber2-hosts");
+		assertNotNull("list is null", bluber);
+		assertTrue("bluber must have host=bluber2", "host=bluber2".equals(bluber.get(0)));
+		
+		k = rini.getKeys("host-.*");
+		assertNotNull("keys are null", k);
+		assertTrue("has no host-bluber element",  k.contains("host-bluber"));
+		//System.out.println(k);
 		
 	}
 
