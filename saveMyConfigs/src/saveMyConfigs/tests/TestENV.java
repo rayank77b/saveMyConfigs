@@ -1,4 +1,4 @@
-package saveMyConfigs.config;
+package saveMyConfigs.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -7,6 +7,13 @@ import static org.junit.Assert.fail;
 import java.util.Map;
 
 import org.junit.Test;
+
+import saveMyConfigs.config.CommandConfig;
+import saveMyConfigs.config.ConfigurationErrorException;
+import saveMyConfigs.config.ENV;
+import saveMyConfigs.config.GitServerConfig;
+import saveMyConfigs.config.HostConnfig;
+import saveMyConfigs.config.SSHServerConfig;
 
 public class TestENV {
 

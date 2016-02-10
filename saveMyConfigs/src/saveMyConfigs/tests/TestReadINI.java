@@ -1,4 +1,4 @@
-package saveMyConfigs.config;
+package saveMyConfigs.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+
+import saveMyConfigs.config.ReadINI;
 
 public class TestReadINI {
 
