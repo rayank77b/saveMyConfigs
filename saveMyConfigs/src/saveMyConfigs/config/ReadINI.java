@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +52,10 @@ public class ReadINI {
 			if(l!=null)
 				lists.put(title, l);
 		br.close();
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	public List<String> getItem(String item) {
