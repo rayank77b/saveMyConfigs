@@ -22,6 +22,8 @@ public class TestCommand {
 		}
 		
 		Command command1 = new Command(env, "file-bluber-config.xml");
+		assertNotNull("commando was not created", command1);
+		System.out.println(command1);
 	}
 
 }
