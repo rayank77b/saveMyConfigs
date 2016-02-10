@@ -10,7 +10,7 @@ host=bluber
 remotepath=/path/config.xml
 localpath=bluber1/config.xml
 */
-public class Command {
+public class CommandConfig {
 	private String command;
 	private String host;
 	private String remotePath;
@@ -26,7 +26,7 @@ public class Command {
 	 * the command are code-wired, that is not good :(
 	 */
 	
-	public Command(String command, String host, String remotePath, String localPath, String how) {
+	public CommandConfig(String command, String host, String remotePath, String localPath, String how) {
 		this.command = command;
 		this.host = host;
 		this.remotePath = remotePath;
@@ -34,7 +34,7 @@ public class Command {
 		this.how = how;
 	}
 	
-	public static Command getCommand(String name, String command, ReadINI iniObject) throws ConfigurationErrorException  {
+	public static CommandConfig getCommand(String name, String command, ReadINI iniObject) throws ConfigurationErrorException  {
 		List<String> commandlist = iniObject.getItem(command);
 		
 		String host=null;
@@ -56,10 +56,10 @@ public class Command {
 		if(host==null || remotepath==null || localpath==null || how==null) {
 			throw new ConfigurationErrorException("errors on read file command configuration, element 2lose");
 		}
-		return new Command(name, host, remotepath, localpath, how);
+		return new CommandConfig(name, host, remotepath, localpath, how);
 	}
 	
-	public static void setCommandConfiguration(ReadINI iniObject, Map<String, Command> commands)  throws ConfigurationErrorException {
+	public static void setCommandConfiguration(ReadINI iniObject, Map<String, CommandConfig> commands)  throws ConfigurationErrorException {
 		Set<String> fileKeys = iniObject.getKeys("file-.*");
 		Set<String> dirsKeys = iniObject.getKeys("dirs-.*");
 		Set<String> ap451Keys = iniObject.getKeys("ap451-.*");
@@ -74,19 +74,19 @@ public class Command {
 		
 		
 		for(String dirs : dirsKeys) {
-			Command c = Command.getCommand("dirs", dirs, iniObject);
+			CommandConfig c = CommandConfig.getCommand("dirs", dirs, iniObject);
 			commands.put(dirs, c);
 		}
 		for(String file : fileKeys) {
-			Command c = Command.getCommand("file", file, iniObject);
+			CommandConfig c = CommandConfig.getCommand("file", file, iniObject);
 			commands.put(file, c);
 		}
 		for(String ap451 : ap451Keys) {
-			Command c = Command.getCommand("ap451", ap451, iniObject);
+			CommandConfig c = CommandConfig.getCommand("ap451", ap451, iniObject);
 			commands.put(ap451, c);
 		}
 		for(String pc6428 : pc6428Keys) {
-			Command c = Command.getCommand("pc6428", pc6428, iniObject);
+			CommandConfig c = CommandConfig.getCommand("pc6428", pc6428, iniObject);
 			commands.put(pc6428, c);
 		}
 	}

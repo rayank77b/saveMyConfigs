@@ -11,20 +11,20 @@ ipaddress=192.168.10.12
 username=name
 password=pass2
  */
-public class Host {
+public class HostConnfig {
 	private String hostName;
 	private String ipAddress;
 	private String userName;
 	private String password;
 	
-	public Host(String hostName, String ipAddress, String userName, String password) {
+	public HostConnfig(String hostName, String ipAddress, String userName, String password) {
 		this.hostName = hostName;
 		this.ipAddress = ipAddress;
 		this.userName = userName;
 		this.password = password;
 	}
 	
-	public static void setHostConfiguration(ReadINI iniObject, Map<String, Host> hosts)  throws ConfigurationErrorException {
+	public static void setHostConfiguration(ReadINI iniObject, Map<String, HostConnfig> hosts)  throws ConfigurationErrorException {
 		Set<String> hostsKeys = iniObject.getKeys("host-.*");
 		if(hostsKeys.size()==0) {
 			throw new ConfigurationErrorException("errors on read hosts configuration");
@@ -52,7 +52,7 @@ public class Host {
 				throw new ConfigurationErrorException("errors on read host configuration, element 2lose");
 			}
 			
-			hosts.put(hostname, new Host(hostname, ip, username, password));
+			hosts.put(hostname, new HostConnfig(hostname, ip, username, password));
 		}
 		if(hosts.size()==0) {
 			throw new ConfigurationErrorException("errors on read hosts configuration, no hosts");

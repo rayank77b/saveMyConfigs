@@ -37,14 +37,14 @@ public class TestENV {
 		assertEquals("username is false", "bla", sshsc.getUserName());
 		assertEquals("password is false", "111111", sshsc.getPassword());
 		
-		Host host = env.getHosts("bluber");
+		HostConnfig host = env.getHosts("bluber");
 		assertEquals("username is false", "name", host.getUserName());
 		assertEquals("we have 4 host in example ini", 4, env.getHostsCount());
 		
-		Map<String, Command> c = env.getCommandMap();
+		Map<String, CommandConfig> c = env.getCommandMap();
 		//c.forEach((k,v)->System.out.println(k));
 		assertEquals("should be 5 commands in example ini", 5, c.size());
-		Command fileCommand1 = env.getCommand("file-bluber-config.xml");
+		CommandConfig fileCommand1 = env.getCommand("file-bluber-config.xml");
 		assertEquals("should be file", "file", fileCommand1.getCommand());
 		assertEquals("should be remotepath /path/config.xml", "/path/config.xml", fileCommand1.getRemotePath());
 		
