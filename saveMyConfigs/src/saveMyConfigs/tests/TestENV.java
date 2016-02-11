@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class TestENV {
 		GitServerConfig gsc = env.getGitServer();
 		assertEquals("username is false", "name", gsc.getUserName());
 		assertEquals("password is false", "pass1", gsc.getPassword());
-		assertEquals("repopath is false", "/home/ray/path/toRepo.git", gsc.getRemotePath());
+		assertEquals("repopath is false", "/home/ray/path/toRepo.git", gsc.getRepoPath());
 		assertEquals("remote url is false", "http://bla:bla@domain.com:8080/git/TestConfig.git", gsc.getRemoteUrl());
 		
 		SSHServerConfig sshsc = env.getSSHServer();
@@ -54,6 +55,9 @@ public class TestENV {
 		CommandConfig fileCommand1 = env.getCommand("file-bluber-config.xml");
 		assertEquals("should be file", "file", fileCommand1.getCommand());
 		assertEquals("should be remotepath /path/config.xml", "/path/config.xml", fileCommand1.getRemotePath());
+		
+		Set<String> cmds = env.getCommandNames();
+		assertEquals("should have file-bluber2-dnsmasq", true, cmds.contains("file-bluber2-dnsmasq"));
 		
 	}
 

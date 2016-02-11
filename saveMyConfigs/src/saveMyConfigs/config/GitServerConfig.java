@@ -12,13 +12,13 @@ remote=http://bla:bla@domain.com:8080/git/TestConfig.git
 public class GitServerConfig {
 	private String userName;
 	private String password;
-	private String remotePath;
+	private String repoPath;
 	private String remoteUrl;
 
 	public GitServerConfig(String userName, String password, String remotePath, String remoteUrl) {
 		this.userName = userName;
 		this.password = password;
-		this.remotePath = remotePath;
+		this.repoPath = remotePath;
 		this.remoteUrl = remoteUrl;
 	}
 	
@@ -68,8 +68,8 @@ public class GitServerConfig {
 	/**
 	 * @return the remotePath
 	 */
-	public String getRemotePath() {
-		return remotePath;
+	public String getRepoPath() {
+		return repoPath;
 	}
 
 	/**
@@ -78,4 +78,15 @@ public class GitServerConfig {
 	public String getRemoteUrl() {
 		return remoteUrl;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "GitServerConfig [userName=" + userName + ", password=" + password + ", remotePath=" + repoPath
+				+ ", remoteUrl=" + remoteUrl + "]";
+	}
+	
 }

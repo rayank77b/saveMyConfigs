@@ -55,6 +55,14 @@ public class SSHServerConfig {
 	public String getPassword() {
 		return password;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SSHServerConfig [ipAddress=" + ipAddress + ", userName=" + userName + ", password=" + password + "]";
+	}
 	
 	
 

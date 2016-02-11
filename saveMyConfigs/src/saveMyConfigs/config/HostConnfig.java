@@ -80,4 +80,15 @@ public class HostConnfig {
 	public String getPassword() {
 		return password;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "HostConnfig [hostName=" + hostName + ", ipAddress=" + ipAddress + ", userName=" + userName
+				+ ", password=" + password + "]";
+	}
+	
+	
 }

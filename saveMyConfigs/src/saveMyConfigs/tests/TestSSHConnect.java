@@ -37,7 +37,16 @@ public class TestSSHConnect {
 			fail("cannot open sftp channel");
 		}
 		
-		
+		try {
+			csftp = sshc.openSFTPChannel();
+			try {
+				sshc.copyFileSFTPChannel("/tmp/a.txt", "/tmp/b.txt", csftp ); // /tmp/a.txt must exists on localhost
+			} catch (SftpException | IOException e) {
+				fail("problems on copy");
+			}
+		} catch (JSchException e) {
+			fail("cannot open sftp channel");
+		}
 		
 	}
 

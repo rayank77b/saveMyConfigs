@@ -111,4 +111,15 @@ public class CommandConfig {
 		return how;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "CommandConfig  [command=" + command + ", host=" + host + ", remotePath=" + remotePath + ", localPath="
+				+ localPath + ", how=" + how + "]";
+	}
+	
+	
+
 }

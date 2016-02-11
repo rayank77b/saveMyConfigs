@@ -1,9 +1,13 @@
 package saveMyConfigs;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -42,9 +46,9 @@ public class SSHConnect {
         return sftpChannel;
 	}
 	
-	public void readSFTPChannel(String remoteFile, ChannelSftp sftpChannel) throws SftpException, IOException {
+	public void readSFTPChannel(String remotePath, ChannelSftp sftpChannel) throws SftpException, IOException {
 		InputStream out= null;
-        out= sftpChannel.get(remoteFile);
+        out= sftpChannel.get(remotePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(out));
         String line;
         while ((line = br.readLine()) != null)
@@ -52,4 +56,21 @@ public class SSHConnect {
         br.close();
 	}
 	
+	public void copyFileSFTPChannel(String remotePath, String localPath, ChannelSftp sftpChannel) throws IOException, SftpException {
+	    InputStream is = null;
+	    OutputStream os = null;
+	    try {
+	        is = sftpChannel.get(remotePath);
+	        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	        os = new FileOutputStream(new File(localPath));
+	        byte[] buffer = new byte[1024];
+	        int length;
+	        while ((length = is.read(buffer)) > 0) {
+	            os.write(buffer, 0, length);
+	        }
+	    } finally {
+	        is.close();
+	        os.close();
+	    }
+	}
 }

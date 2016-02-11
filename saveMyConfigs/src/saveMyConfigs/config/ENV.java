@@ -3,6 +3,7 @@ package saveMyConfigs.config;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ENV {
 	private String fileNameIni;
@@ -48,8 +49,20 @@ public class ENV {
 		return this.commands;
 	}
 	
+	public Set<String> getCommandNames() {
+		return this.commands.keySet();
+	}
+	
 	public CommandConfig getCommand(String command) {
 		return this.commands.get(command);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ENV [fileNameIni=" + fileNameIni + "]";
 	}
 	
 }
