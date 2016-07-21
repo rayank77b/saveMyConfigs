@@ -1,0 +1,75 @@
+<saveMyConfigs>
+	 
+	<git-configs comment="define git access data">
+		<username>name</username>
+		<password>pass1</password>
+		<repopath>/home/ray/path/toRepo.git</repopath>
+		<remote>http://bla:bla@domain.com:8080/git/TestConfig.git</remote>
+	</git-configs>
+	
+	<ssh-server comment="define ssh server access data">
+		<ip4>192.168.10.50</ip4>
+		<username>bla</username>
+		<password>11111</password>
+	</ssh-server>
+	
+	<devices comment="define hosts access data">
+		<host>
+			<name>bluber</name>
+			<ip4>192.168.10.12</ip4>
+			<username>name</username>
+			<password>pass2</password>
+		</host>
+		<host>
+			<name>bluber2</name>
+			<ip4>192.168.10.13</ip4>
+			<username>name</username>
+			<password>pass2</password>
+		</host>
+		<switch>
+			<name>swicht01.mycompany.com</name>
+			<ip4>192.168.10.1</ip4>
+			<username>name</username>
+			<password>pass23</password>
+		</switch>
+		<accesspoint>
+			<name>ap541.mycompany.com</name>
+			<ip4>192.168.10.2</ip4>
+			<username>blub</username>
+			<password>pass23</password>
+		</accesspoint>
+	</devices>
+	
+	<commands>
+		<file>
+			<host>bluber</host>
+			<remotepath>/path/config.xml</remotepath>
+			<localpath>bluber1/config.xml</localpath>
+			<how>ssh</how>
+		</file>
+		<file>
+			<host>bluber2</host>
+			<remotepath>/etc/dnsmasq.conf</remotepath>
+			<localpath>bluber2/dnsmasq.conf</localpath>
+			<how>ssh</how>
+		</file>
+		<pc6428-switch>
+			<host>swicht01.mycompany.com</host>
+			<remotepath>/tmp/swicht01-running-config</remotepath>
+			<localpath>swicht01/running-config</localpath>
+			<how>https</how>
+		</pc6428-switch>
+		<acesspoint>
+			<host>ap541.mycompany.com</host>
+			<remotepath>/tmp/config.xml</remotepath>
+			<localpath>ap541/config.xml</localpath>
+			<how>https</how>
+		</acesspoint>
+		<dirs>
+			<host>bluber2</host>
+			<remotepath>/etc</remotepath>
+			<localpath>bluber2/etc</localpath>
+			<how>ssh</how>
+		</dirs>
+	</commands>
+</saveMyConfigs>
